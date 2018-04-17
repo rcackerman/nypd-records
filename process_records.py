@@ -26,7 +26,7 @@ COPS['FileName'] = COPS.apply(
         lambda row: '{last}-{first}-{caseno}.pdf'.format(last=row['LastName'],
                                                          first=row['FirstName'],
                                                          caseno=row['Case']), axis=1)
-COPS['FileName'] = COPS['FileName'].str.replace(r'[/\]', '-')
+COPS['FileName'] = COPS['FileName'].str.replace(r'[/\\]', '-')
 COPS['FileName'] = COPS['FileName'].str.replace('__', '_')
 
 for idx, row in COPS.iterrows():
