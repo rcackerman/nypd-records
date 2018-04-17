@@ -1,6 +1,14 @@
 import pandas as pd
 from documentcloud import DocumentCloud
 
+DC_CLIENT = DocumentCloud()
+
+def download_doc(row, client):
+    case_pdf = client.documents.get(row['DocID']).pdf
+    with open(row['FileName'], 'wb') as outfile:
+        outfile.write(case_pdf)
+
+
 COPS = pd.read_csv('nypd-discipline.csv')
 
 COPS['Name'] = COPS['NameNo'].str.extract('([^/]*) /', expand=False)
@@ -18,3 +26,8 @@ COPS['FileName'] = COPS.apply(
         lambda row: '{last}-{first}-{caseno}.pdf'.format(last=row['LastName'],
                                                          first=row['FirstName'],
                                                          caseno=row['Case']), axis=1)
+COPS['FileName'] = COPS['FileName'].str.replace(r'[/\]', '-')
+COPS['FileName'] = COPS['FileName'].str.replace('__', '_')
+
+for idx, row in COPS.iterrows():
+    download_doc(row, DC_CLIENT)
