@@ -1,7 +1,7 @@
 import pandas as pd
-from documentcloud import DocumentCloud
+# from documentcloud import DocumentCloud
 
-DC_CLIENT = DocumentCloud()
+# DC_CLIENT = DocumentCloud()
 
 def download_doc(row, client):
     case_pdf = client.documents.get(row['DocID']).pdf
@@ -29,5 +29,17 @@ cops['FileName'] = cops.apply(
 cops['FileName'] = cops['FileName'].str.replace(r'[/\\]', '-')
 cops['FileName'] = cops['FileName'].str.replace('__', '_')
 
-for idx, row in cops.iterrows():
-    download_doc(row, DC_CLIENT)
+cops.to_csv('cleaned-nypd-discipline.csv', index=False)
+
+# for idx, row in cops.iterrows():
+    # download_doc(row, DC_CLIENT)
+
+nycds_cases = pd.read_csv('all-cases-2-years.csv')
+nycds_cases = nycds_cases.loc[~pd.isnull(nycds_cases['Arrest Officer'])]
+
+pat = r"(?P<last>.*), (?P<first>.*)"
+repl = lambda m: "{} {}".format(m.group('first'), m.group('last'))
+nycds_cases['arrest_officer'] = nycds_cases['Arrest Officer'].str.replace(pat, repl)
+
+nycds_cases.to_csv('formatted-nycds-cases.csv', index=False)
+
